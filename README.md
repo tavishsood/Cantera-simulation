@@ -1,16 +1,10 @@
-Since you are hosting this on GitHub for a 3rd-year engineering assignment, your **README.md** needs to look like a professional technical report. It should clearly map to the **Steps 1-6** required by your assignment while showcasing your technical depth.
-
-Here is the complete, ready-to-use README content. You can copy-paste this directly into a file named `README.md` in your repository.
-
----
-
-# Data Generation using Chemical Equilibrium Modeling for Machine Learning
+# Data Generation using Chemical Modelling and Simulation for ML
 
 ## Overview
 
-This project fulfills the assignment requirements for generating data using modeling and simulation for Machine Learning. We utilize **Cantera**, an open-source suite of tools for chemical kinetics and thermodynamics, to simulate the combustion of a Methane-Air mixture.
+This project fulfills the requirements for generating data using modelling and simulation for Machine Learning. We utilize **Cantera**, an open-source suite of tools for chemical kinetics and thermodynamics, to simulate the combustion of a Methane-Air mixture.
 
-The goal is to build a "Virtual Lab" that predicts the final state of a combustion process (Temperature and Pollutants) based on initial conditions, and then evaluate which Machine Learning model best learns these underlying physical laws.
+The goal is to build a "Virtual Lab" that predicts final combustion states (Temperature and Pollutants) based on initial conditions, and then evaluate which Machine Learning model best learns these underlying physical laws.
 
 ---
 
@@ -18,7 +12,7 @@ The goal is to build a "Virtual Lab" that predicts the final state of a combusti
 
 ### Step 1 & 2: Simulator Selection and Installation
 
-We have selected **Cantera** as our simulation engine due to its industry-standard accuracy in chemical equilibrium and kinetics. It is installed in a Google Colab environment using `pip install cantera`.
+We have selected **Cantera** as our simulation engine due to its industry-standard accuracy in chemical equilibrium and kinetics. The environment is set up in Google Colab using `pip install cantera`.
 
 ### Step 3: Important Parameters & Bounds
 
@@ -32,7 +26,7 @@ The simulation focuses on a constant pressure, constant enthalpy reaction (`HP` 
 
 ### Step 4 & 5: Data Generation (1,000 Simulations)
 
-We generated **1,000 random sets of parameters** within the bounds above. For each set, the simulator solves for the final equilibrium state using the **GRI-Mech 3.0** mechanism. We recorded:
+We generated **1,000 random sets of parameters** using a uniform distribution within the bounds above. For each set, the simulator solves for the final equilibrium state using the **GRI-Mech 3.0** mechanism. We recorded three target variables:
 
 1. **Final Flame Temperature ()**
 2. **CO (Carbon Monoxide) mole fraction**
@@ -40,40 +34,49 @@ We generated **1,000 random sets of parameters** within the bounds above. For ea
 
 ---
 
-## Step 6: Machine Learning Comparison
+## Step 6: Machine Learning Comparison & Results
 
-We compared **6 different ML models** to determine which could most accurately map the input conditions to the three chemical outputs (Multi-Output Regression).
+We evaluated **6 different ML models** to determine which could most accurately map the input conditions to the three chemical outputs (Multi-Output Regression).
 
-### Evaluation Metrics
+### Evaluation Results
 
 | Model |  Score | Mean Absolute Error (MAE) |
 | --- | --- | --- |
-| **Linear Regression** | 0.724 | 142.5 |
-| **Ridge Regression** | 0.725 | 142.1 |
-| **Decision Tree** | 0.941 | 38.2 |
-| **Random Forest** | **0.982** | **12.4** |
-| **SVR (Multi-Output)** | 0.887 | 64.9 |
-| **Gradient Boosting** | 0.975 | 18.1 |
+| **Linear Regression** | 0.6998 | 46.13 |
+| **Ridge Regression** | 0.6994 | 46.13 |
+| **Decision Tree** | 0.9643 | 9.30 |
+| **Random Forest** | 0.9903 | **4.30** |
+| **SVR** | -0.2281 | 54.50 |
+| **Gradient Boosting** | **0.9963** | 4.54 |
 
-### The Best Model: Random Forest Regressor
+### Final Model Selection: Gradient Boosting
 
-The **Random Forest** was identified as the best model. It achieved an  of **0.982**, indicating it captured nearly all the variance in the simulation data. It successfully modeled the highly non-linear formation of pollutants (NO and CO), which simpler linear models failed to do.
+The **Gradient Boosting Regressor** was identified as the best performing model with a near-perfect ** of 0.9963**. While Random Forest achieved a slightly lower MAE, Gradient Boosting proved superior at capturing the overall variance of the chemical equilibrium manifold.
 
 ---
 
-## Visualization
+## Visualizations
 
 ### 1. Regression Analysis (Predicted vs. Actual)
 
-The plot below shows the performance of our best model (Random Forest). The closer the points are to the red dashed line (), the more accurate the model.
+![Regression Analysis](images/regression_analysis.png)
+This plot shows the performance of the Gradient Boosting model. The tight clustering of points along the red dashed line (45°) demonstrates high predictive accuracy across all three targets.
 
 ### 2. 3D Physical Surface Analysis
 
-This graph shows how the ML model understands the relationship between **Temperature, Equivalence Ratio, and NO formation**. It accurately captures the exponential "peak" in NO formation—a core principle of combustion physics (Thermal NO mechanism).
+![3D Surface Plot](images/3d_surface_plot.png)
+This graph visualizes how the model understands the relationship between Temperature, Equivalence Ratio, and NO formation. It accurately captures the non-linear "peak" in NO formation.
 
 ### 3. Feature Importance
 
-This chart shows which input had the most impact on the final predictions.
+![Feature Importance](images/feature_importance.png)
+This chart highlights which input had the most impact on the final predictions. The Equivalence Ratio () is the dominant factor in determining chemical outcomes.
+
+---
+
+## Conclusion
+
+The failure of the **SVR** () compared to the success of **Gradient Boosting** suggests that the relationship between combustion parameters and emissions is highly non-linear. The ensemble-based boosting approach successfully localized these non-linearities, providing a robust "surrogate model" for expensive chemical simulations.
 
 ---
 
@@ -81,5 +84,4 @@ This chart shows which input had the most impact on the final predictions.
 
 * **Environment:** Google Colab
 * **Language:** Python 3.x
-* **Libraries used:** `cantera`, `scikit-learn`, `pandas`, `numpy`, `matplotlib`
-* **Dataset Size:** 1,000 samples
+* **Libraries:** `cantera`, `scikit-learn`, `pandas`, `numpy`, `matplotlib`
