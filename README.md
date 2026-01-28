@@ -34,24 +34,24 @@ We generated **1,000 random sets of parameters** using a uniform distribution wi
 
 ---
 
-## Step 6: Machine Learning Comparison & Results
+## Step 6: Machine Learning Comparison & Ranking (TOPSIS)
 
-We evaluated **6 different ML models** to determine which could most accurately map the input conditions to the three chemical outputs (Multi-Output Regression).
+To identify the overall "Best" model, we evaluated 6 algorithms across 5 distinct metrics: **R² Score**, **MAE**, **MSE**, **RMSE**, and **Training Time**. We then applied the **TOPSIS** (Technique for Order of Preference by Similarity to Ideal Solution) algorithm with equal weights (w=1) to rank the models based on accuracy and efficiency.
 
-### Evaluation Results
+### Multi-Metric Evaluation Results
 
-| Model | R² Score | Mean Absolute Error (MAE) |
-| --- | --- | --- |
-| **Linear Regression** | 0.6998 | 46.13 |
-| **Ridge Regression** | 0.6994 | 46.13 |
-| **Decision Tree** | 0.9643 | 9.30 |
-| **Random Forest** | 0.9903 | **4.30** |
-| **SVR** | -0.2281 | 54.50 |
-| **Gradient Boosting** | **0.9963** | 4.54 |
+| Model | R² | MAE | MSE | RMSE | Time (s) | TOPSIS Score | Rank |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **Decision Tree** | 0.9364 | 9.25 | 433.13 | 20.81 | 0.0061 | **0.9462** | **1** |
+| **Random Forest** | 0.9867 | 4.43 | 108.30 | 10.40 | 0.4497 | 0.7130 | 2 |
+| **Gradient Boosting** | 0.9957 | 4.61 | 111.44 | 10.55 | 0.6657 | 0.6218 | 3 |
+| **Linear Regression** | 0.7050 | 45.07 | 8178.75 | 90.43 | 0.0032 | 0.5806 | 4 |
+| **Ridge Regression** | 0.7052 | 45.08 | 8188.40 | 90.48 | 0.0023 | 0.5806 | 5 |
+| **SVR** | -0.2367 | 58.24 | 16361.36 | 127.91 | 0.0381 | 0.3648 | 6 |
 
-### Final Model Selection: Gradient Boosting
+### Final Model Selection: Decision Tree
 
-The **Gradient Boosting Regressor** was identified as the best performing model with a near-perfect **R² of 0.9963**. While Random Forest achieved a slightly lower MAE, Gradient Boosting proved superior at capturing the overall variance of the chemical equilibrium manifold.
+While Gradient Boosting and Random Forest achieved higher R² scores, the **Decision Tree** was identified by TOPSIS as the optimal model. This is due to its exceptional balance between high accuracy and near-instantaneous training speed, making it the most efficient "surrogate model" for real-time combustion predictions.
 
 ---
 
@@ -60,7 +60,7 @@ The **Gradient Boosting Regressor** was identified as the best performing model 
 ### 1. Regression Analysis (Predicted vs. Actual)
 
 ![Regression Analysis](images/regression_analysis.png)
-This plot shows the performance of the Gradient Boosting model. The tight clustering of points along the red dashed line (45°) demonstrates high predictive accuracy across all three targets.
+This plot shows the performance of the TOPSIS winner. The tight clustering along the red dashed line (45°) demonstrates high predictive accuracy across all three chemical targets.
 
 ### 2. 3D Physical Surface Analysis
 
@@ -70,13 +70,13 @@ This graph visualizes how the model understands the relationship between Tempera
 ### 3. Feature Importance
 
 ![Feature Importance](images/feature_importance.png)
-This chart highlights which input had the most impact on the final predictions. The **Equivalence Ratio (ϕ)** is the dominant factor in determining chemical outcomes.
+This chart highlights which input had the most impact on the final predictions. The **Equivalence Ratio (ϕ)** remains the dominant factor in determining chemical outcomes.
 
 ---
 
 ## Conclusion
 
-The failure of the **SVR (R² < 0)** compared to the success of **Gradient Boosting** suggests that the relationship between combustion parameters and emissions is highly non-linear. The ensemble-based boosting approach successfully localized these non-linearities, providing a robust "surrogate model" for expensive chemical simulations.
+The use of **TOPSIS** allowed for a multi-dimensional comparison beyond simple accuracy. The results indicate that ensemble methods (RF, GB) are slightly more accurate for chemical manifolds, but simple trees offer significantly better computational efficiency. The failure of the **SVR (R² < 0)** underscores the highly non-linear nature of combustion physics, which requires tree-based partitioning to model successfully.
 
 ---
 
